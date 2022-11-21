@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+
 import { CreateUserDTO } from 'src/app/models/user.model';
 
 import { UserService } from 'src/app/services/user.service';
@@ -28,6 +30,7 @@ export class RegisterFormComponent implements OnInit {
   status: 'loading' | 'success' | 'error' | 'init' = 'init';
 
   constructor(
+    private router: Router,
     private fb: FormBuilder,
     private userService: UserService
   ) { }
@@ -44,6 +47,7 @@ export class RegisterFormComponent implements OnInit {
           next: res => {
             // console.info(res);
             this.status = 'success';
+            this.router.navigateByUrl('/login');
           },
           error: err => {
             // console.error(err);

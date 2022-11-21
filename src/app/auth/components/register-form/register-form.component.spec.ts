@@ -1,6 +1,9 @@
+import { Router } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+
+import { of } from 'rxjs';
 
 import { UserService } from 'src/app/services/user.service';
 
@@ -8,28 +11,34 @@ import { RegisterFormComponent } from './register-form.component';
 
 import { generateUser } from 'src/app/data/user.mock';
 import { asyncReject, asyncResolve, clickElement, getText, setCheckValue, setInputValue } from 'src/testing';
-import { of } from 'rxjs';
 
-describe('RegisterFormComponent', () => {
+fdescribe('RegisterFormComponent', () => {
   let userService: UserService;
+  let router: jasmine.SpyObj<Router>;
 
   let component: RegisterFormComponent;
   let fixture: ComponentFixture<RegisterFormComponent>;
 
   beforeEach(async () => {
+    const routerSpy = jasmine.createSpyObj('Router', ['navigateByUrl']);
+
     await TestBed.configureTestingModule({
       imports: [
         ReactiveFormsModule,
         HttpClientTestingModule,
       ],
       declarations: [RegisterFormComponent],
-      providers: [UserService]
+      providers: [
+        UserService,
+        { provide: Router, useValue: routerSpy }
+      ]
     })
       .compileComponents();
   });
 
   beforeEach(() => {
     userService = TestBed.inject(UserService);
+    router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
 
     fixture = TestBed.createComponent(RegisterFormComponent);
     component = fixture.componentInstance;
@@ -191,4 +200,31 @@ describe('RegisterFormComponent', () => {
     expect(errorMessage).withContext('Email unavailable').toContain('This email address is not available');
     expect(userService.isAvailableByEmail).withContext('Have been calle with email').toHaveBeenCalledWith('admin@mail.com');
   });
+
+  it('should navigate to /login when registration is complete', fakeAsync(() => {
+    spyOn(userService, 'isAvailableByEmail').and.returnValue(of({ isAvailable: true }));
+
+    setInputValue(fixture, 'Fulano', 'input#name');
+    setInputValue(fixture, 'fulano@email.com', 'input#email');
+    setInputValue(fixture, 'Abc.1234', 'input#password');
+    setInputValue(fixture, 'Abc.1234', 'input#confirmPassword');
+    setCheckValue(fixture, true, 'input#terms');
+
+    const mockUser = generateUser();
+    spyOn(userService, 'create').and.returnValue(asyncResolve(mockUser));
+
+    clickElement(fixture, 'btn-submit', true);
+    fixture.detectChanges();
+
+    expect(component.form.valid).withContext('Form should be valid').toBeTrue();
+    expect(component.status).withContext('Status should be "loading"').toEqual('loading');
+
+    tick();
+    fixture.detectChanges();
+
+    expect(component.status).withContext('Status should be "success"').toEqual('success');
+    expect(userService.create).withContext('Create should have been called').toHaveBeenCalled();
+
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/login');
+  }));
 });
