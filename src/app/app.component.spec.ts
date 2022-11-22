@@ -60,8 +60,8 @@ describe('AppComponent', () => {
       '/',
       '/auth/login',
       '/auth/register',
-      '/people',
       '/products',
+      '/people',
       '/preview',
       '/others'
     ];

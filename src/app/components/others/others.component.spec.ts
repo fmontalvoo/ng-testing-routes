@@ -1,5 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { OthersComponent } from './others.component';
 import { HighlightDirective } from 'src/app/shared/directives/highlight.directive';
@@ -10,7 +11,10 @@ describe('OthersComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [FormsModule],
+      imports: [
+        FormsModule,
+        HttpClientTestingModule,
+      ],
       declarations: [
         OthersComponent,
         HighlightDirective

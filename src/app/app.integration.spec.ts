@@ -15,7 +15,7 @@ import { generateProducts } from "./data/product.mock";
 import { asyncResolve, clickElement, getText, query, queryAllByDirective } from "src/testing";
 import { generateUser } from "./data/user.mock";
 
-fdescribe('App integration test', () => {
+describe('App integration test', () => {
   let router: Router;
   let component: AppComponent;
   let fixture: ComponentFixture<AppComponent>;
