@@ -5,7 +5,7 @@ import { OthersComponent } from './components/others/others.component';
 import { PeopleComponent } from './components/people/people.component';
 import { PreviewComponent } from './components/preview/preview.component';
 
-const routes: Routes = [
+export const routes: Routes = [
   {
     path: 'auth',
     loadChildren: () => import('./auth/auth.module').then(m => m.AuthModule)

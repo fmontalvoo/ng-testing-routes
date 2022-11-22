@@ -11,7 +11,7 @@ import { TokenService } from "../services/token.service";
 import { generateUser } from "../data/user.mock";
 import { fakeActivatedRouteSnapshot, fakeParamMap, fakeRouterStateSnapshot } from "src/testing";
 
-fdescribe('AuthGuard', () => {
+describe('AuthGuard', () => {
   let authGuard: AuthGuard;
 
   let tokenService: TokenService;
