@@ -11,7 +11,7 @@ import { queryAllByDirective, RouterLinkDirectiveStub } from 'src/testing';
 })
 class BannerComponentStub { }
 
-fdescribe('AppComponent', () => {
+describe('AppComponent', () => {
   let component: AppComponent;
   let fixture: ComponentFixture<AppComponent>;
 

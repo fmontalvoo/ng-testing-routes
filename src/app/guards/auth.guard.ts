@@ -16,7 +16,7 @@ export class AuthGuard implements CanActivate {
     private tokenService: TokenService,
     private authService: AuthService,
     private router: Router
-  ) {}
+  ) { }
 
   canActivate(
     route: ActivatedRouteSnapshot,
@@ -28,15 +28,15 @@ export class AuthGuard implements CanActivate {
     // }
     // return true;
     return this.authService.user$
-    .pipe(
-      map(user => {
-        if(!user) {
-          this.router.navigate(['/home']);
-          return false;
-        }
-        return true;
-      })
-    )
+      .pipe(
+        map(user => {
+          if (!user) {
+            this.router.navigate(['/home']);
+            return false;
+          }
+          return true;
+        })
+      )
   }
 
 }
