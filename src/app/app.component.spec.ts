@@ -1,17 +1,30 @@
-import { TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
+
 import { AppComponent } from './app.component';
 
-describe('AppComponent', () => {
+import { queryAllByDirective, RouterLinkDirectiveStub } from 'src/testing';
+
+fdescribe('AppComponent', () => {
+  let component: AppComponent;
+  let fixture: ComponentFixture<AppComponent>;
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [
         RouterTestingModule
       ],
       declarations: [
-        AppComponent
+        AppComponent,
+        RouterLinkDirectiveStub,
       ],
     }).compileComponents();
+  });
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(AppComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
   });
 
   it('should create the app', () => {
@@ -26,10 +39,29 @@ describe('AppComponent', () => {
     expect(app.title).toEqual('ng-testing-routes');
   });
 
-  xit('should render title', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.content span')?.textContent).toContain('ng-testing-routes app is running!');
+  it('should be 7 routerLink directives', () => {
+    const links = queryAllByDirective(fixture, RouterLinkDirectiveStub);
+
+    expect(links.length).toEqual(7);
+  });
+
+  it('should be 7 routerLink directives with match routes', () => {
+    const links = queryAllByDirective(fixture, RouterLinkDirectiveStub);
+    const routerLinks: RouterLinkDirectiveStub[] = links.map(link => link.injector.get(RouterLinkDirectiveStub));
+    const paths = [
+      '/',
+      '/auth/login',
+      '/auth/register',
+      '/people',
+      '/products',
+      '/preview',
+      '/others'
+    ];
+
+    expect(links.length).toEqual(7);
+
+    routerLinks.forEach((link, i) => {
+      expect(link.linkParams).toEqual(paths[i]);
+    });
   });
 });

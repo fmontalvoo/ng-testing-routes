@@ -11,7 +11,7 @@ import { ProductDetailComponent } from './product-detail.component';
 import { generateProduct } from 'src/app/data/product.mock';
 import { asyncResolve, getText, ActivatedRouteStub } from 'src/testing';
 
-fdescribe('ProductDetailComponent', () => {
+describe('ProductDetailComponent', () => {
   let component: ProductDetailComponent;
   let fixture: ComponentFixture<ProductDetailComponent>;
 
