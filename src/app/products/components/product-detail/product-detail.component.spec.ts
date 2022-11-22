@@ -5,12 +5,11 @@ import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testin
 import { of } from 'rxjs';
 
 import { ProductService } from 'src/app/services/product.service';
-import { ActivatedRouteStub } from 'src/testing/activated-route-stub';
 
 import { ProductDetailComponent } from './product-detail.component';
 
-import { asyncResolve, getText } from 'src/testing';
 import { generateProduct } from 'src/app/data/product.mock';
+import { asyncResolve, getText, ActivatedRouteStub } from 'src/testing';
 
 fdescribe('ProductDetailComponent', () => {
   let component: ProductDetailComponent;
@@ -60,7 +59,7 @@ fdescribe('ProductDetailComponent', () => {
     const productId = '1';
     route.setParamMap({ id: productId });
 
-    const productMock = { ...generateProduct(), id: '1' };
+    const productMock = { ...generateProduct(), id: productId };
 
     productService.getOne.and.returnValue(of(productMock));
 
@@ -71,8 +70,8 @@ fdescribe('ProductDetailComponent', () => {
     const description = getText(fixture, 'description', true);
 
     expect(title).toEqual(productMock.title);
-    expect(price).toContain(productMock.price);
     expect(description).toEqual(productMock.description);
+    expect(price).toContain(productMock.price.toString());
 
     expect(productService.getOne).withContext(`getOne(${productId}) should be called`).toHaveBeenCalledWith(productId);
   });
@@ -80,7 +79,7 @@ fdescribe('ProductDetailComponent', () => {
   it('should get the product and change the status from "loading" to "success"', fakeAsync(() => {
     const productId = '2';
     route.setParamMap({ id: productId });
-    const productMock = { ...generateProduct(), id: '2' };
+    const productMock = { ...generateProduct(), id: productId };
 
     productService.getOne.and.returnValue(asyncResolve(productMock));
 
@@ -105,5 +104,23 @@ fdescribe('ProductDetailComponent', () => {
 
     expect(location.back).withContext('back() should be called').toHaveBeenCalled();
     expect(component.goToBack).withContext('goToBack() should be called').toHaveBeenCalled();
+  });
+
+  it('should typeCostumer be "customer"', () => {
+    const productId = '3';
+    const type = 'customer';
+    route.setParamMap({ id: productId });
+    route.setQueryParamMap({ type });
+
+    const productMock = { ...generateProduct(), id: productId };
+    productService.getOne.and.returnValue(of(productMock));
+
+    fixture.detectChanges();
+
+    expect(component.typeCostumer).toBe(type);
+
+    const typeCostumer = getText(fixture, 'type', true);
+
+    expect(typeCostumer).toBe(type);
   });
 });
