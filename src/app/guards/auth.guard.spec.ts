@@ -9,7 +9,7 @@ import { AuthService } from "../services/auth.service";
 import { TokenService } from "../services/token.service";
 
 import { generateUser } from "../data/user.mock";
-import { fakeActivatedRouteSnapshot, fakeRouterStateSnapshot } from "src/testing";
+import { fakeActivatedRouteSnapshot, fakeParamMap, fakeRouterStateSnapshot } from "src/testing";
 
 fdescribe('AuthGuard', () => {
   let authGuard: AuthGuard;
@@ -43,7 +43,10 @@ fdescribe('AuthGuard', () => {
   });
 
   it('should be true with an active user session', (doneFn) => {
-    const route = fakeActivatedRouteSnapshot({});
+    const route = fakeActivatedRouteSnapshot({
+      params: { productId: '1' },
+      paramMap: fakeParamMap({ type: 'customer' }),
+    });
     const state = fakeRouterStateSnapshot({});
 
     const mockUser = generateUser();
@@ -57,7 +60,10 @@ fdescribe('AuthGuard', () => {
   });
 
   it('should be false without a user session', (doneFn) => {
-    const route = fakeActivatedRouteSnapshot({});
+    const route = fakeActivatedRouteSnapshot({
+      params: { productId: '2' },
+      paramMap: fakeParamMap({ type: 'customer' }),
+    });
     const state = fakeRouterStateSnapshot({});
 
     authService.getUser.and.returnValue(of(null))
