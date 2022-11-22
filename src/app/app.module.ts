@@ -14,6 +14,8 @@ import { PersonComponent } from './components/person/person.component';
 import { PreviewComponent } from './components/preview/preview.component';
 
 import { TokenInterceptor } from './interceptors/token.interceptor';
+import { BannerComponent } from './components/banner/banner.component';
+import { FooterComponent } from './components/footer/footer.component';
 
 @NgModule({
   imports: [
@@ -30,6 +32,8 @@ import { TokenInterceptor } from './interceptors/token.interceptor';
     PeopleComponent,
     PersonComponent,
     PreviewComponent,
+    BannerComponent,
+    FooterComponent,
   ],
   providers: [
     {

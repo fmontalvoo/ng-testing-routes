@@ -1,9 +1,15 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
 import { RouterTestingModule } from '@angular/router/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { AppComponent } from './app.component';
 
 import { queryAllByDirective, RouterLinkDirectiveStub } from 'src/testing';
+
+@Component({
+  selector: 'app-banner'
+})
+class BannerComponentStub { }
 
 fdescribe('AppComponent', () => {
   let component: AppComponent;
@@ -16,8 +22,10 @@ fdescribe('AppComponent', () => {
       ],
       declarations: [
         AppComponent,
+        BannerComponentStub,
         RouterLinkDirectiveStub,
       ],
+      schemas: [NO_ERRORS_SCHEMA] // Ignora los componentes que no estan incluidos en las declaraciones.
     }).compileComponents();
   });
 
