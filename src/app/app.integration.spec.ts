@@ -8,19 +8,23 @@ import { routes } from "./app-routing.module";
 
 import { AppComponent } from "./app.component";
 
+import { AuthService } from "./services/auth.service";
 import { ProductService } from "./services/product.service";
 
 import { generateProducts } from "./data/product.mock";
 import { asyncResolve, clickElement, getText, query, queryAllByDirective } from "src/testing";
+import { generateUser } from "./data/user.mock";
 
 fdescribe('App integration test', () => {
   let router: Router;
   let component: AppComponent;
   let fixture: ComponentFixture<AppComponent>;
 
+  let authService: jasmine.SpyObj<AuthService>;
   let productService: jasmine.SpyObj<ProductService>;
 
   beforeEach(async () => {
+    const authServiceSpy = jasmine.createSpyObj('AuthService', ['getUser']);
     const productServiceSpy = jasmine.createSpyObj('ProductService', ['getAll']);
 
     await TestBed.configureTestingModule({
@@ -29,6 +33,7 @@ fdescribe('App integration test', () => {
         RouterTestingModule.withRoutes(routes),
       ],
       providers: [
+        { provide: AuthService, useValue: authServiceSpy },
         { provide: ProductService, useValue: productServiceSpy },
       ],
       schemas: [NO_ERRORS_SCHEMA] // Ignora los componentes que no estan incluidos en las declaraciones.
@@ -40,6 +45,7 @@ fdescribe('App integration test', () => {
     component = fixture.componentInstance;
     fixture.detectChanges();
 
+    authService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
     productService = TestBed.inject(ProductService) as jasmine.SpyObj<ProductService>;
 
     router = TestBed.inject(Router);
@@ -58,7 +64,7 @@ fdescribe('App integration test', () => {
     expect(links.length).toEqual(7);
   });
 
-  it('should perform the navigation to /others when click on the link.', fakeAsync(() => {
+  it('should perform the navigation to /others when click on the link', fakeAsync(() => {
     const productsMock = generateProducts(10);
     productService.getAll.and.returnValue(asyncResolve(productsMock));
 
@@ -78,8 +84,11 @@ fdescribe('App integration test', () => {
     expect(result).toContain(productsMock.length.toString());
   }));
 
-  it('should perform the navigation to /preview when click on the link.', fakeAsync(() => {
+  it('should perform navigation to /preview when the link is clicked and the user is logged in', fakeAsync(() => {
     clickElement(fixture, 'preview-link', true);
+
+    const userMock = generateUser();
+    authService.getUser.and.returnValue(asyncResolve(userMock));
 
     tick(); // Espera miestras termina de hacer la navegacion cuando hay un cambio de ruta.
     fixture.detectChanges(); // ngOnInit -> PreviewComponent
@@ -87,6 +96,19 @@ fdescribe('App integration test', () => {
     expect(router.url).toEqual('/preview');
     const element = query(fixture, 'app-preview');
     expect(element).toBeTruthy();
+  }));
+
+  it('should not navigate to /preview when the link is clicked and the user is not logged in', fakeAsync(() => {
+    clickElement(fixture, 'preview-link', true);
+
+    authService.getUser.and.returnValue(asyncResolve(null));
+
+    tick(); // Espera miestras termina de hacer la navegacion cuando hay un cambio de ruta.
+    fixture.detectChanges(); // ngOnInit -> PreviewComponent
+
+    expect(router.url).toEqual('/');
+    // const element = query(fixture, 'app-component');
+    // expect(element).toBeTruthy();
   }));
 
   // it('',()=>{});
