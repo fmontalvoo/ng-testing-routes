@@ -14,6 +14,8 @@ export class ProductDetailComponent implements OnInit {
   productId: string | null = null;
   product: Product | null = null;
 
+  status: 'loading' | 'success' | 'error' | 'init' = 'init';
+
   constructor(
     private route: ActivatedRoute,
     private productService: ProductService,
@@ -32,14 +34,18 @@ export class ProductDetailComponent implements OnInit {
   }
 
   private getProduct(productId: string) {
-    this.productService.getOne(productId).subscribe({
-      next: (data) => {
-        this.product = data;
-      },
-      error: () => {
-        this.goToBack();
-      },
-    });
+    this.status = 'loading';
+    this.productService.getOne(productId)
+      .subscribe({
+        next: (data) => {
+          this.status = 'success';
+          this.product = data;
+        },
+        error: () => {
+          this.status = 'error';
+          this.goToBack();
+        },
+      });
   }
 
   goToBack() {

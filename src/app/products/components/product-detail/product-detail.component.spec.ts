@@ -1,6 +1,6 @@
 import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 
 import { of } from 'rxjs';
 
@@ -8,6 +8,8 @@ import { ProductService } from 'src/app/services/product.service';
 import { ActivatedRouteStub } from 'src/testing/activated-route-stub';
 
 import { ProductDetailComponent } from './product-detail.component';
+
+import { asyncResolve, getText } from 'src/testing';
 import { generateProduct } from 'src/app/data/product.mock';
 
 fdescribe('ProductDetailComponent', () => {
@@ -40,7 +42,9 @@ fdescribe('ProductDetailComponent', () => {
 
     fixture = TestBed.createComponent(ProductDetailComponent);
     component = fixture.componentInstance;
+  });
 
+  it('should create', () => {
     const productId = '1';
     route.setParamMap({ id: productId });
 
@@ -49,9 +53,57 @@ fdescribe('ProductDetailComponent', () => {
     productService.getOne.and.returnValue(of(productMock));
 
     fixture.detectChanges();
+    expect(component).toBeTruthy();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  it('should show the product on UI', () => {
+    const productId = '1';
+    route.setParamMap({ id: productId });
+
+    const productMock = { ...generateProduct(), id: '1' };
+
+    productService.getOne.and.returnValue(of(productMock));
+
+    fixture.detectChanges();
+
+    const title = getText(fixture, 'title', true);
+    const price = getText(fixture, 'price', true);
+    const description = getText(fixture, 'description', true);
+
+    expect(title).toEqual(productMock.title);
+    expect(price).toContain(productMock.price);
+    expect(description).toEqual(productMock.description);
+
+    expect(productService.getOne).withContext(`getOne(${productId}) should be called`).toHaveBeenCalledWith(productId);
+  });
+
+  it('should get the product and change the status from "loading" to "success"', fakeAsync(() => {
+    const productId = '2';
+    route.setParamMap({ id: productId });
+    const productMock = { ...generateProduct(), id: '2' };
+
+    productService.getOne.and.returnValue(asyncResolve(productMock));
+
+    fixture.detectChanges();
+
+    expect(component.status).withContext('Status should be "loading"').toEqual('loading');
+
+    tick();
+    fixture.detectChanges();
+
+    expect(component.status).withContext('Status should be "success"').toEqual('success');
+    expect(productService.getOne).withContext(`getOne(${productId}) should be called`).toHaveBeenCalledWith(productId);
+  }));
+
+  it('should go back if there is no productId', () => {
+    route.setParamMap({});
+    spyOn(component, 'goToBack').and.callThrough();
+
+    fixture.detectChanges();
+
+    location.back.and.callThrough();
+
+    expect(location.back).withContext('back() should be called').toHaveBeenCalled();
+    expect(component.goToBack).withContext('goToBack() should be called').toHaveBeenCalled();
   });
 });
